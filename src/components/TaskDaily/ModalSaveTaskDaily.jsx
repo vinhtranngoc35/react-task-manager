@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import {
     Button,
     Dialog,
@@ -96,13 +96,21 @@ export function ModalSaveTaskDaily({ search }) {
     ]
     const form = useRef();
     const mumation = useCreateTask();
-    const onSubmit = (e) => {
+    const onSubmit = async (e) => {
 
-        mumation.mutate(e);
+        await mumation.mutate(e,
+            {
+                onSuccess: () => {
+                    console.log('success')
+                    client.invalidateQueries({
+                        queryKey: [TASK]
+                    })
+                    // client.invalidateQueries(DAILY_TASKS, search);
+                }
+            });
         setOpen(false);
         success('Created');
-        client.invalidateQueries([DAILY_TASKS, search]);
-        client.invalidateQueries([TASK])
+
     }
     return (
         <>
